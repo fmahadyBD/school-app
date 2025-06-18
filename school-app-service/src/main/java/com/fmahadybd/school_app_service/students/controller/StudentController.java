@@ -1,6 +1,7 @@
 package com.fmahadybd.school_app_service.students.controller;
 
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.fmahadybd.school_app_service.students.entity.Student;
 import com.fmahadybd.school_app_service.students.response.ApiResponse;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -84,11 +86,18 @@ public class StudentController {
     // return ResponseEntity.ok().body(List.of(new Student()));
     // }
 
-    // @PostMapping("/save-student")
-    // public String postMethodName(@RequestBody String entity) {
-    // //TODO: process POST request
-
-    // return entity;
-    // }
+    @PostMapping("/save-student")
+    public ResponseEntity<ApiResponse> saveStudent(
+            @RequestPart(value = "student") Student student,
+            @RequestParam(value = "profilePicture", required = false) MultipartFile profilePicture) {
+        try {
+            studentService.saveStudent(student, profilePicture);
+            ApiResponse response = new ApiResponse("Student saved successfully", true, null, 201);
+            return ResponseEntity.status(201).body(response);
+        } catch (Exception e) {
+            ApiResponse response = new ApiResponse("Failed to save student", false, null, 500);
+            return ResponseEntity.status(500).body(response);
+        }
+    }
 
 }
