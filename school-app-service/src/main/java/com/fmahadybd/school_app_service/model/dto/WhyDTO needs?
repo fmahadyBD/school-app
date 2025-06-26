@@ -1,0 +1,29 @@
+    Separation of Concerns:
+
+        Request DTOs for input validation
+
+        Response DTOs for API output
+
+        Simple DTOs for nested relationships
+
+    Validation:
+
+        Annotations like @NotBlank, @Email, @Pattern on request DTOs
+
+        Proper field constraints matching entity validation
+
+    Immutable Records:
+
+        Using Java records for immutable DTOs
+
+        Better thread safety and clarity
+
+    Nested Relationships:
+
+        Simple DTOs prevent circular references
+
+        Avoid exposing unnecessary entity details
+
+    Pagination Support:
+
+        Can be added with Page<StudentResponseDTO> in controller responses
