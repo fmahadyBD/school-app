@@ -1,9 +1,13 @@
 package com.fmahadybd.school_app_service.controller;
 
-import org.springframework.web.bind.annotation.RestController;
+import com.fmahadybd.school_app_service.model.domain.Student;
+import com.fmahadybd.school_app_service.model.dto.StudentRequestDTO;
+import com.fmahadybd.school_app_service.model.dto.StudentUpdateDTO;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fmahadybd.school_app_service.persistence.entity.StudentEntity;
 import com.fmahadybd.school_app_service.model.response.ApiResponse;
 import com.fmahadybd.school_app_service.services.StudentService;
 
@@ -11,12 +15,8 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.PostMapping;
 
 @RestController
 @RequestMapping("/students")
@@ -24,79 +24,48 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class StudentController {
     private final StudentService studentService;
 
-    @GetMapping("/get-all-students")
-    public ResponseEntity<ApiResponse> getAllStudents() {
-        try {
-            List<StudentEntity> students = studentService.getAllStudents();
-            ApiResponse response = new ApiResponse("Students retrived Successfully", true, students, 200);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            ApiResponse response = new ApiResponse("Failed to retrieve students", false, null, 500);
-            return ResponseEntity.status(500).body(response);
-        }
+    @Operation(summary = "Get all students")
+    @GetMapping("/")
+    public ResponseEntity<ApiResponse> getAllStudents(
+            @ParameterObject Pageable pageable
+    ) {
+        List<Student> students = studentService.getAllStudents(pageable);
+        ApiResponse response = new ApiResponse("Students retrieved successfully", true, students, 200);
+        return ResponseEntity.ok(response);
     }
 
-    // @GetMapping("/get-students-by-name")
-    // public ResponseEntity<List<Student>> getMethodName(@RequestParam String name)
-    // {
-    // return ResponseEntity.ok().body(List.of(new Student()));
-    // }
-
-    // @GetMapping("/get-student-by-id")
-    // public String getMethodName(@RequestParam String param) {
-    // return new String();
-    // }
-
-    // @GetMapping("/get-students-by-class")
-    // public String getMethodName(@RequestParam String param) {
-    // return new String();
-    // }
-
-    // @GetMapping("/get-students-by-class-with-section")
-    // public String getMethodName(@RequestParam String param) {
-    // return new String();
-
-    // }
-
-    // @GetMapping("/get-students-by-class-with-section-and-group")
-    // public String getMethodName(@RequestParam String param) {
-    // return new String();
-    // }
-
-    // @GetMapping("/get-total-students-by-class")
-    // public String getMethodName(@RequestParam String param) {
-    // return new String();
-    // }
-
-    // @GetMapping("/get-total-students-by-class-with-section")
-    // public String getMethodName(@RequestParam String param) {
-    // return new String();
-    // }
-
-    // @GetMapping("/get-total-students-by-class-with-section-and-group")
-    // public String getMethodName(@RequestParam String param) {
-    // return new String();
-    // }
-
-    // @GetMapping("/get-students-by-guardian-name")
-    // public ResponseEntity<List<Student>> getStudentsByGuardianName(@RequestParam
-    // String guardianName) {
-    // // Logic to fetch students by guardian name
-    // return ResponseEntity.ok().body(List.of(new Student()));
-    // }
-
-    @PostMapping("/save-student")
+    @Operation(summary = "Save Student")
+    @PostMapping("/")
     public ResponseEntity<ApiResponse> saveStudent(
-            @RequestPart(value = "student") StudentEntity student,
+            @RequestPart(value = "student") StudentRequestDTO studentRequestDto,
             @RequestParam(value = "profilePicture", required = false) MultipartFile profilePicture) {
-        try {
-            studentService.saveStudent(student, profilePicture);
-            ApiResponse response = new ApiResponse("Student saved successfully", true, null, 201);
-            return ResponseEntity.status(201).body(response);
-        } catch (Exception e) {
-            ApiResponse response = new ApiResponse("Failed to save student", false, null, 500);
-            return ResponseEntity.status(500).body(response);
-        }
+        Long id = studentService.saveStudent(studentRequestDto, profilePicture);
+        ApiResponse response = new ApiResponse("Student saved successfully", true, id, 201);
+        return ResponseEntity.status(201).body(response);
     }
 
+    @Operation(summary = "Delete Student with the id")
+    @DeleteMapping("/{id}")  // Fixed the path variable mapping
+    public ResponseEntity<ApiResponse> deleteStudent(@PathVariable Long id) {
+        studentService.deleteStudent(id);
+        return ResponseEntity.ok(new ApiResponse("Student deleted successfully", true, null, 200));
+    }
+
+    @Operation(summary = "Update student ")
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse> updateStudent(
+            @PathVariable Long id,
+            StudentUpdateDTO studentUpdateDTO
+    ){
+        studentService.updateStudent(id, studentUpdateDTO);
+        return ResponseEntity.ok(new ApiResponse("Student updated successfully", true, id, 200));
+    }
+
+    @Operation(summary = "Get student by id")
+    @GetMapping("/get-by-id/{id}")
+    public ResponseEntity<ApiResponse> getStudentById(@PathVariable Long id){
+        Student student = studentService.getStudentById(id);
+        ApiResponse response = new ApiResponse("Student retrieved successfully", true, student, 200);
+        return ResponseEntity.ok(response);
+    }
 }
