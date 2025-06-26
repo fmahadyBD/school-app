@@ -1,4 +1,4 @@
-package com.fmahadybd.school_app_service.students.service;
+package com.fmahadybd.school_app_service.services;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import com.fmahadybd.school_app_service.persistence.repository.StudentEntityRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fmahadybd.school_app_service.students.entity.Student;
-import com.fmahadybd.school_app_service.students.repository.StudentRepository;
+import com.fmahadybd.school_app_service.persistence.entity.StudentEntity;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class StudentService {
 
-    private final StudentRepository studentRepository;
+    private final StudentEntityRepository studentEntityRepository;
 
     @Value("${upload-dir}")
     private String uploadDir;
@@ -32,20 +32,21 @@ public class StudentService {
     @Value("${max-file-size:5242880}")
     private long maxFileSize;
 
+    // limit the extentetions
     private static final Set<String> ALLOWED_IMAGE_TYPES = Set.of("jpg", "jpeg", "png");
 
-    public List<Student> getAllStudents() {
-        return studentRepository.findAll();
+    public List<StudentEntity> getAllStudents() {
+        return studentEntityRepository.findAll();
     }
 
-    public void saveStudent(Student student, MultipartFile profilePicture) throws IOException {
+    public void saveStudent(StudentEntity student, MultipartFile profilePicture) throws IOException {
         if (profilePicture != null && !profilePicture.isEmpty()) {
             validateImage(profilePicture);
             String imageFileName = saveImage(profilePicture, student);
             student.setProfilePicture(imageFileName);
         }
 
-        studentRepository.save(student);
+        studentEntityRepository.save(student);
     }
 
     private void validateImage(MultipartFile file) throws IOException {
@@ -75,17 +76,17 @@ public class StudentService {
     }
 
     public void deleteStudent(Long studentId) throws IOException {
-        Student student = studentRepository.findById(studentId)
+        StudentEntity student = studentEntityRepository.findById(studentId)
                 .orElseThrow(() -> new EntityNotFoundException("Student not found"));
 
         if (student.getProfilePicture() != null) {
             deleteStudentImage(student.getProfilePicture());
         }
 
-        studentRepository.delete(student);
+        studentEntityRepository.delete(student);
     }
 
-    private String saveImage(MultipartFile profilePicture, Student student) throws IOException {
+    private String saveImage(MultipartFile profilePicture, StudentEntity student) throws IOException {
 
         // create upload directory if it does not exist
         Path uploadPath = Paths.get(uploadDir + "/students");

@@ -1,4 +1,4 @@
-package com.fmahadybd.school_app_service.students.response;
+package com.fmahadybd.school_app_service.model.response;
 
 
 

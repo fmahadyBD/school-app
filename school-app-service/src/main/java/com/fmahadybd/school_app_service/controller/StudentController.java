@@ -1,11 +1,11 @@
-package com.fmahadybd.school_app_service.students.controller;
+package com.fmahadybd.school_app_service.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fmahadybd.school_app_service.students.entity.Student;
-import com.fmahadybd.school_app_service.students.response.ApiResponse;
-import com.fmahadybd.school_app_service.students.service.StudentService;
+import com.fmahadybd.school_app_service.persistence.entity.StudentEntity;
+import com.fmahadybd.school_app_service.model.response.ApiResponse;
+import com.fmahadybd.school_app_service.services.StudentService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/students")
@@ -28,7 +27,7 @@ public class StudentController {
     @GetMapping("/get-all-students")
     public ResponseEntity<ApiResponse> getAllStudents() {
         try {
-            List<Student> students = studentService.getAllStudents();
+            List<StudentEntity> students = studentService.getAllStudents();
             ApiResponse response = new ApiResponse("Students retrived Successfully", true, students, 200);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -88,7 +87,7 @@ public class StudentController {
 
     @PostMapping("/save-student")
     public ResponseEntity<ApiResponse> saveStudent(
-            @RequestPart(value = "student") Student student,
+            @RequestPart(value = "student") StudentEntity student,
             @RequestParam(value = "profilePicture", required = false) MultipartFile profilePicture) {
         try {
             studentService.saveStudent(student, profilePicture);

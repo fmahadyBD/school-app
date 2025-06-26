@@ -1,4 +1,4 @@
-package com.fmahadybd.school_app_service.common.enums;
+package com.fmahadybd.school_app_service.enums;
 
 public enum Sex {
     MALE("Male"),

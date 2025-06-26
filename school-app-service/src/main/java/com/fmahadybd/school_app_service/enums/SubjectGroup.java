@@ -1,4 +1,4 @@
-package com.fmahadybd.school_app_service.students.enums;
+package com.fmahadybd.school_app_service.enums;
 
 public enum SubjectGroup {
     SCIENCE("Science"),

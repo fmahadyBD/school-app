@@ -1,39 +1,51 @@
-package com.fmahadybd.school_app_service.students.entity;
+package com.fmahadybd.school_app_service.persistence.entity;
 
-import com.fmahadybd.school_app_service.students.enums.SubjectGroup;
+import com.fmahadybd.school_app_service.enums.SubjectGroup;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Subject {
+public class SubjectEntity {
     @Id
-    @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(nullable = false)
     private String name;
+
     private String code;
     private String description;
     private String className; // e.g., "Class 10", "Class 11"
-    private SubjectGroup group; // e.g., "Science", "Arts", "Commerce","Regular"
 
+    @Column(name = "subject_group")
+    private SubjectGroup subjectGroup; // e.g., "Science", "Arts", "Commerce","Regular"
+
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
     private String createdAt; // Timestamp for when the subject was created
+
+    @UpdateTimestamp
     private String updatedAt; // Timestamp for when the subject was last updated
+
     private String deletedAt; // Nullable, used for soft deletion
+
+    // TODO Manke enumatration
     private String status; // e.g., "active", "inactive"
 
-    // TODO: add a Manye to One relation with teacher entity
-    private String teacherId; // ID of the teacher assigned to this subject
+
+    @ManyToOne
+    @JoinColumn(name = "teacher_id")
+    private TeacherEntity teacher;
 }
 // Note: The `teacherId` field is a placeholder for the ID of the teacher
 // assigned to this subject.
